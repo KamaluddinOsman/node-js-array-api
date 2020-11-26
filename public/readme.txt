@@ -1,0 +1,1 @@
+this it where you should put your client-side assets
