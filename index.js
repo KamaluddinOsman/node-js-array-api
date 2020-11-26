@@ -1,8 +1,10 @@
 const Joi       = require('Joi');
 const express   = require('express')
-
+const customMiddleware = require('./customMiddleware');
 const app = express();
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+app.use(customMiddleware);
 
 const items = [
     { id: 1, name: "element 1"},
