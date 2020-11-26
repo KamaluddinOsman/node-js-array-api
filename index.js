@@ -1,12 +1,18 @@
 const Joi       = require('Joi');
 const express   = require('express');
 const morgan    = require('morgan');
+const config    = require('config');
 const customMiddleware = require('./customMiddleware');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(customMiddleware);
 app.use(express.static('public'));
+
+// Configration
+console.log("Application Name: " + config.get('name'));
+console.log("Mail Server: " + config.get('mail.host'));
+console.log("Mail Password: " + config.get('mail.password'));
 
 // Set morgan to works only in development environment
 if (app.get('env') === 'development'){
