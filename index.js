@@ -1,11 +1,18 @@
 const Joi       = require('Joi');
-const express   = require('express')
+const express   = require('express');
+const morgan    = require('morgan');
 const customMiddleware = require('./customMiddleware');
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(customMiddleware);
+app.use(express.static('public'));
 
+// Set morgan to works only in development environment
+if (app.get('env') === 'development'){
+    app.use(morgan('tiny'));
+    console.log(`NODE_ENV: ${app.get('env')}, and Morgan is enabled`);
+}
 const items = [
     { id: 1, name: "element 1"},
     { id: 2, name: "element 2"},
@@ -13,6 +20,7 @@ const items = [
 ];
 
 // route for the main index
+// will no longer works after adding express.static()
 app.get('/' , (request, response) => {
     response.send('Main index');
 });
