@@ -1,6 +1,8 @@
 const Joi       = require('Joi');
 const express   = require('express');
 const morgan    = require('morgan');
+const config    = require('config');
+const debug     = require('debug')('app:startup');
 const customMiddleware = require('./customMiddleware');
 const app = express();
 app.use(express.json());
@@ -8,10 +10,15 @@ app.use(express.urlencoded({extended: true}));
 app.use(customMiddleware);
 app.use(express.static('public'));
 
+// Configration
+debug("Application Name: " + config.get('name'));
+debug("Mail Server: " + config.get('mail.host'));
+debug("Mail Password: " + config.get('mail.password'));
+
 // Set morgan to works only in development environment
 if (app.get('env') === 'development'){
     app.use(morgan('tiny'));
-    console.log(`NODE_ENV: ${app.get('env')}, and Morgan is enabled`);
+    debug(`NODE_ENV: ${app.get('env')}, and Morgan is enabled`);
 }
 const items = [
     { id: 1, name: "element 1"},

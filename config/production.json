@@ -1,0 +1,6 @@
+{
+    "name": "Node js API with array - Production",
+    "mail": {
+        "host": "prod-mail-server"
+    }
+}
