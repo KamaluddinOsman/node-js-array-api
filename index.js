@@ -1,5 +1,5 @@
 const Joi       = require('Joi');
-const express = require('express')
+const express   = require('express')
 
 const app = express();
 app.use(express.json());
@@ -8,51 +8,77 @@ const items = [
     { id: 1, name: "element 1"},
     { id: 2, name: "element 2"},
     { id: 3, name: "element 3"},
-    { id: 4, name: "element 4"},
-    { id: 5, name: "element 5"},
 ];
 
-//route for the main index
-app.get('/' , (req, res) => {
-    res.send('Main index');
+// route for the main index
+app.get('/' , (request, response) => {
+    response.send('Main index');
 });
 
-//Get all Items
-app.get('/api/items', (req, res) => {
-   res.send(items); 
+// Get all [Items]
+app.get('/api/items', (request, response) => {
+   response.status(200).send(items); 
 });
 
-//Get specific it with it's id
-app.get('/api/items/:id', (req, res) => {
-    const item = items.find(c => c.id === parseInt(req.params.id));
-    res.send(item)
+// Get specific [item]
+app.get('/api/items/:id', (request, response) => {
+    // Check if [item] exist
+    const item = items.find(c => c.id === parseInt(request.params.id));
+    if (!item) return response.status(404).send('[Item] not found');
+
+    response.status(200).send(item)
 });
 
-//update item
-app.put('/api/items/:id', (req, res) => {
-    const item  = items.find(c => c.id === parseInt(req.params.id));
-    item.name   = req.body.name;
-    res.send(item);
+// update [item]
+app.put('/api/items/:id', (request, response) => {
+    // Check if [item] exist
+    const item  = items.find(c => c.id === parseInt(request.params.id));
+    if (!item) return response.status(404).send('[Item] not found');
+    // Validate request
+    const { error } = validateItem(request.body);
+    if (error) return response.status(400).send(error.details[0].message);
+    
+    item.name   = request.body.name;// Update [item] date
+
+    response.send(item);
 });
 
-//Add new item
-app.post('/api/items', (req, res) => {
+// Add new [item]
+app.post('/api/items', (request, response) => {
+    // Validate request
+    const { error } = validateItem(request.body);
+    if (error) return response.status(400).send(error.details[0].message);
+    // Create new object [item]
     const item = {
         id: items.length + 1,
-        name: req.body.name
+        name: request.body.name
     };
-    items.push(item);
-    res.send(item);
+    items.push(item);// Add to array
+
+    response.send(item);
 });
 
 //Delet item
-app.delete('/api/items/:id', (req, res) => {
-    const item  = items.find(c => c.id === parseInt(req.params.id));
+app.delete('/api/items/:id', (request, response) => {
+    // Check if [item] exist
+    const item  = items.find(c => c.id === parseInt(request.params.id));
+    if (!item) return response.status(404).send('[Item] not found');
+    // Get [item] index and remove [itme]
     const index = items.indexOf(item);
-
     items.splice(index, 1);
-    res.send(item);
+
+    response.send(item);
 });
 
+//Validate the request
+function validateItem(item) {
+    const schema = Joi.object({
+        name: Joi.string().required().min(3),
+    });
+
+    return schema.validate({
+        name: item.name,
+    });
+}
 const port = process.env.PORT | 3000;
 app.listen(3000, () => console.log(`listening to port ${port}`));
